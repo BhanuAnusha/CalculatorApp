@@ -1,38 +1,54 @@
 package com.example.calculator;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class App {
-    public static void main(String[] args) {
-        Calculator calculator = new Calculator();
-        
-        try (Scanner scanner = new Scanner(System.in)) {
+    private final Calculator calculator;
+    private final InputStream inputStream;
+    private final PrintStream outputStream;
+
+    // Constructor for dependency injection (useful for testing)
+    public App(Calculator calculator, InputStream inputStream, PrintStream outputStream) {
+        this.calculator = calculator;
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
+    }
+
+    // Default constructor (uses System.in and System.out)
+    public App() {
+        this(new Calculator(), System.in, System.out);
+    }
+
+    public void run() {
+        try (Scanner scanner = new Scanner(inputStream)) {
             while (true) {
-                System.out.println("\nSimple Calculator");
-                System.out.println("1. Add");
-                System.out.println("2. Subtract");
-                System.out.println("3. Multiply");
-                System.out.println("4. Divide");
-                System.out.println("5. Exit");
-                System.out.print("Choose operation (1-5): ");
+                outputStream.println("\nSimple Calculator");
+                outputStream.println("1. Add");
+                outputStream.println("2. Subtract");
+                outputStream.println("3. Multiply");
+                outputStream.println("4. Divide");
+                outputStream.println("5. Exit");
+                outputStream.print("Choose operation (1-5): ");
 
                 try {
                     int choice = scanner.nextInt();
                     
                     if (choice == 5) {
-                        System.out.println("Exiting calculator...");
+                        outputStream.println("Exiting calculator...");
                         break;
                     }
 
                     if (choice < 1 || choice > 5) {
-                        System.out.println("Invalid choice! Please enter 1-5");
+                        outputStream.println("Invalid choice! Please enter 1-5");
                         continue;
                     }
 
-                    System.out.print("Enter first number: ");
+                    outputStream.print("Enter first number: ");
                     double num1 = scanner.nextDouble();
-                    System.out.print("Enter second number: ");
+                    outputStream.print("Enter second number: ");
                     double num2 = scanner.nextDouble();
 
                     double result = 0;
@@ -50,19 +66,23 @@ public class App {
                             try {
                                 result = calculator.divide(num1, num2);
                             } catch (ArithmeticException e) {
-                                System.out.println("Error: " + e.getMessage());
+                                outputStream.println("Error: " + e.getMessage());
                                 continue;
                             }
                             break;
                     }
 
-                    System.out.println("Result: " + result);
+                    outputStream.println("Result: " + result);
                     
                 } catch (InputMismatchException e) {
-                    System.out.println("Invalid input! Please enter numbers only.");
+                    outputStream.println("Invalid input! Please enter numbers only.");
                     scanner.nextLine(); // Clear the invalid input
                 }
             }
         }
+    }
+
+    public static void main(String[] args) {
+        new App().run(); // Delegate to the instance method
     }
 }
