@@ -6,21 +6,42 @@
     <groupId>com.example</groupId>
     <artifactId>calculator-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>calculator-app</name>
+    <url>http://maven.apache.org</url>
     
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.release>11</maven.compiler.release>
         <junit.version>5.8.2</junit.version>
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.10</jacoco.version>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.language>java</sonar.language>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <log4j.version>2.23.1</log4j.version>
+        
+        <!-- Default values for environment variables -->
+        <build.number>${env.BUILD_NUMBER}</build.number>
+        <job.name>${env.JOB_NAME}</job.name>
+        <git.commit>${env.GIT_COMMIT}</git.commit>
     </properties>
     
     <dependencies>
-        <!-- Main dependencies -->
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
         
         <!-- Testing -->
         <dependency>
@@ -59,6 +80,9 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <release>${maven.compiler.release}</release>
+                    <fork>true</fork>
+                    <executable>/opt/java/openjdk/bin/javac</executable>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                 </configuration>
@@ -68,7 +92,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.5.0</version>
                 <configuration>
                     <includes>
                         <include>**/*Test.java</include>
@@ -124,7 +148,7 @@
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
-                <version>3.9.1.2184</version>
+                <version>4.0.0.4121</version>
             </plugin>
             
             <!-- Security Scanning -->
