@@ -1,1 +1,45 @@
+# Compiled class files
+*.class
 /target/
+/bin/
+
+# Build output
+**/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Eclipse files
+.settings/
+.project
+.classpath
+*.launch
+*.pydevproject
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+*.ids
+*.orig
+*.swp
+
+# Maven logs
+dependency-reduced-pom.xml
+maven-*.log
+
+# Log files
+*.log
+logs/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# SonarQube
+.sonar/
+.scannerwork/
+
+# Environment files
+.env
+*.env
