@@ -26,12 +26,11 @@ class AppTest {
 
     @Test
     void testExitOption() {
-        // Simulate user entering "5" (exit)
         String input = "5\n";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         app = new App(calculator, inputStream, new PrintStream(outputStream));
 
-        app.run(); // Should exit immediately
+        app.run();
 
         String output = outputStream.toString();
         assertTrue(output.contains("Exiting calculator..."));
@@ -39,7 +38,6 @@ class AppTest {
 
     @Test
     void testAddOperation() {
-        // Simulate: 1 (Add), 5.0, 3.0, then 5 (Exit)
         String input = "1\n5.0\n3.0\n5\n";
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         app = new App(calculator, inputStream, new PrintStream(outputStream));
@@ -53,9 +51,76 @@ class AppTest {
     }
 
     @Test
-    void testInvalidInput() {
-        // Simulate: "abc" (invalid), then 5 (exit)
-        String input = "abc\n5\n";
+    void testSubtractOperation() {
+        String input = "2\n10.0\n4.0\n5\n";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        app = new App(calculator, inputStream, new PrintStream(outputStream));
+
+        when(calculator.subtract(10.0, 4.0)).thenReturn(6.0);
+
+        app.run();
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Result: 6.0"));
+    }
+
+    @Test
+    void testMultiplyOperation() {
+        String input = "3\n6.0\n7.0\n5\n";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        app = new App(calculator, inputStream, new PrintStream(outputStream));
+
+        when(calculator.multiply(6.0, 7.0)).thenReturn(42.0);
+
+        app.run();
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Result: 42.0"));
+    }
+
+    @Test
+    void testDivideOperation() {
+        String input = "4\n20.0\n4.0\n5\n";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        app = new App(calculator, inputStream, new PrintStream(outputStream));
+
+        when(calculator.divide(20.0, 4.0)).thenReturn(5.0);
+
+        app.run();
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Result: 5.0"));
+    }
+
+    @Test
+    void testDivideByZeroHandling() {
+        String input = "4\n10.0\n0.0\n5\n";
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        app = new App(calculator, inputStream, new PrintStream(outputStream));
+
+        when(calculator.divide(10.0, 0.0)).thenThrow(new ArithmeticException("Division by zero"));
+
+        app.run();
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Error: Division by zero"));
+    }
+
+    @Test
+    void testInvalidChoiceHandling() {
+        String input = "6\n5\n"; // User enters invalid choice (6), then exits
+        InputStream inputStream = new ByteArrayInputStream(input.getBytes());
+        app = new App(calculator, inputStream, new PrintStream(outputStream));
+
+        app.run();
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("Invalid choice! Please enter 1-5"));
+    }
+
+    @Test
+    void testInvalidInputHandling() {
+        String input = "abc\n5\n"; // User enters invalid input, then exits
         InputStream inputStream = new ByteArrayInputStream(input.getBytes());
         app = new App(calculator, inputStream, new PrintStream(outputStream));
 
