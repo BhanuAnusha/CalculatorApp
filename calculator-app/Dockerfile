@@ -2,36 +2,26 @@
 FROM maven:3.8.6-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
-# First download dependencies to cache them
 RUN mvn dependency:go-offline
 COPY src ./src
-# Package with skipTests if you don't need tests in the image build
 RUN mvn clean package -DskipTests
 
-# Runtime stage
-FROM eclipse-temurin:17-jre-jammy
+# Runtime stage - using JDK instead of JRE for better diagnostics
+FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
-# Install unzip for verification (temporary)
-RUN apt-get update && \
-    apt-get install -y unzip && \
-    rm -rf /var/lib/apt/lists/*
+# Copy the specific JAR file (not wildcard)
+COPY --from=build /app/target/calculator-app-*.jar app.jar
 
-# Copy the specific JAR file
-COPY --from=build /app/target/*.jar app.jar
-
-# Verify the JAR structure before running
-RUN sh -c '\
-    if ! unzip -p app.jar META-INF/MANIFEST.MF | grep -q "Main-Class:"; then \
-        echo "ERROR: JAR file is not executable - check your Maven build"; \
-        echo "Found JAR files in target:"; \
-        ls -l /app/target/; \
-        unzip -p app.jar META-INF/MANIFEST.MF; \
+# Verify using jar command (available in JDK)
+RUN jar xf app.jar META-INF/MANIFEST.MF && \
+    if ! grep -q "Main-Class:" META-INF/MANIFEST.MF; then \
+        echo "ERROR: Not an executable JAR - check your Maven build!"; \
+        echo "=== MANIFEST CONTENTS ==="; \
+        cat META-INF/MANIFEST.MF; \
+        echo "=== JAR CONTENTS ==="; \
+        jar tf app.jar | head -20; \
         exit 1; \
-    fi'
+    fi
 
-# Remove unzip to reduce image size (optional)
-RUN apt-get purge -y unzip && apt-get autoremove -y
-
-# Use shell form to allow variable expansion
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
