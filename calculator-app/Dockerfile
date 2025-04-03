@@ -25,5 +25,5 @@ RUN sh -c '\
         echo "ERROR: Not a valid Spring Boot executable JAR!" && exit 1; \
     fi'
 
-EXPOSE 8081
-ENTRYPOINT ["java","-jar","app.jar", "-Dserver.port=8081"]
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","app.jar"]
