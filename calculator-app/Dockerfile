@@ -1,29 +1,13 @@
-# Build stage
-FROM maven:3.8.6-eclipse-temurin-17 AS builder
+# Stage 1: Build using Maven
+FROM maven:3.9.5-eclipse-temurin-11 AS build
+
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
+COPY . .
 RUN mvn clean package -DskipTests
 
-# Runtime stage
-FROM eclipse-temurin:17-jre-jammy
+# Stage 2: Use JRE-only base image
+FROM eclipse-temurin:11-jre
 WORKDIR /app
+COPY --from=build /app/target/calculator-app-1.0.0.jar app.jar
 
-# Create a non-root user and group
-RUN groupadd -r spring && useradd -r -g spring spring
-USER spring:spring
-
-# Copy JAR from builder
-COPY --from=builder --chown=spring:spring /app/target/*.jar app.jar
-
-# Verify JAR exists and is executable (Spring Boot compatible check)
-RUN sh -c '\
-    if [ ! -f app.jar ]; then \
-        echo "ERROR: JAR file not found!" && exit 1; \
-    fi && \
-    if ! java -Djarmode=layertools -jar app.jar list >/dev/null 2>&1; then \
-        echo "ERROR: Not a valid Spring Boot executable JAR!" && exit 1; \
-    fi'
-
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
