@@ -26,4 +26,4 @@ RUN sh -c '\
     fi'
 
 EXPOSE 8081
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java","-jar","app.jar", "-Dserver.port=8081"]
